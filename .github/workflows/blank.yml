@@ -1,0 +1,24 @@
+on:
+  workflow_dispatch:
+    inputs:
+      company:
+        description: 'Company stock name'
+        required: true
+        default: 'GOOG'
+      market:
+        description: 'Country to report for'
+        required: false
+jobs:
+  build_report:
+    runs-on: ubuntu-latest
+    name: Run Parameterised Datapane report
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - uses: datapane/build-action@v2
+        with:
+          script: "reports/financials.py"
+          token: ${{ secrets.TOKEN }}
+          parameters: ${{ toJson(github.event.inputs) }}
