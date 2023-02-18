@@ -2,16 +2,24 @@ name: "GitHub Actions Shell"
 on:
   workflow_dispatch:
     inputs:
-      command:
-        description: 'The command to run'
+      company:
+        description: 'Company stock name'
         required: true
+        default: 'GOOG'
+      market:
+        description: 'Country to report for'
+        required: false
 jobs:
-  run:
+  build_report:
     runs-on: ubuntu-latest
+    name: Run Parameterised Datapane report
     steps:
-    - uses: actions/checkout@v2
-    - run: ${{ github.event.inputs.command }}
-    env:
-      GIT_COMMITTER_NAME: GitHub Actions Shell
-      GIT_AUTHOR_NAME: GitHub Actions Shell
-      EMAIL: github-actions[bot]@users.noreply.github.com
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - uses: datapane/build-action@v2
+        with:
+          script: "reports/financials.py"
+          token: ${{ secrets.TOKEN }}
+          parameters: ${{ toJson(github.event.inputs) }}
